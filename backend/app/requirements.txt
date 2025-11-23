@@ -79,7 +79,6 @@ Pygments==2.19.2
 pyjokes==0.8.3
 pypdfium2==5.0.0
 PyPika==0.48.9
-pypiwin32==223
 pyproject_hooks==1.2.0
 pyreadline3==3.5.4
 python-dateutil==2.9.0.post0
@@ -123,4 +122,5 @@ watchfiles==1.1.1
 websocket-client==1.9.0
 websockets==15.0.1
 zipp==3.23.0
+
 
