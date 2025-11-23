@@ -87,8 +87,7 @@ python-dotenv==1.2.1
 python-multipart==0.0.20
 pytokens==0.3.0
 pyttsx3==2.99
-pytz==2025.2
-pywin32==311
+pytz
 PyYAML==6.0.3
 referencing==0.37.0
 regex==2025.11.3
@@ -124,3 +123,4 @@ watchfiles==1.1.1
 websocket-client==1.9.0
 websockets==15.0.1
 zipp==3.23.0
+
