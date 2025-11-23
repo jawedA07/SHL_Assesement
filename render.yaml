@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: shl-backend
+    env: python
+    buildCommand: "pip install -r backend/app/requirements.txt"
+    startCommand: "uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
+    plan: free
+    envVars:
+      - key: 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
+        fromSecret: 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
+      - key: CHROMA_DB_DIR
+        value: "/opt/render/project/src/db/chroma"
