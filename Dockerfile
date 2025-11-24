@@ -1,19 +1,21 @@
 FROM python:3.11-slim
 
-# Set working dir
 WORKDIR /app
 
-# Copy requirements
-COPY backend/app/requirements.txt .
+# Install system dependencies
+RUN apt update && apt install -y \
+    curl build-essential gcc libsqlite3-dev && \
+    apt clean
 
-# Install dependencies
+# Speed up pip
+RUN pip install --upgrade pip setuptools wheel
+
+COPY backend/app/requirements.txt requirements.txt
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the backend code
 COPY backend/app .
 
-# Expose FastAPI port
 EXPOSE 8000
 
-# Run FastAPI
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
