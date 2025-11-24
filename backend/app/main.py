@@ -1,15 +1,17 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
 from .embeddings import embed_texts
 from .chroma_utils import create_collection
-from fastapi.middleware.cors import CORSMiddleware
 
 COL_NAME = "shl_catalog"
 
 app = FastAPI(title="SHL Assessment Recommender")
 
-# Allow local frontend dev access
+# Allow frontend access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,13 +19,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return JSONResponse(
+        {
+            "service": "SHL Assessment Recommender API",
+            "status": "online",
+            "available_endpoints": [
+                "/health",
+                "/recommend",
+                "/docs",
+                "/openapi.json"
+            ]
+        }
+    )
+
 class RecommendRequest(BaseModel):
     query: str
     n_results: Optional[int] = 5
 
 @app.get("/health")
 def health():
-    return {"status":"ok"}
+    return {"status": "ok"}
 
 @app.post("/recommend")
 def recommend(req: RecommendRequest):
@@ -35,12 +52,19 @@ def recommend(req: RecommendRequest):
 
     q_emb = embed_texts([q])[0]
     col = create_collection(COL_NAME)
-    results = col.query(query_embeddings=[q_emb], n_results=n, include=['metadatas','documents','distances'])
+
+    results = col.query(
+        query_embeddings=[q_emb],
+        n_results=n,
+        include=['metadatas', 'documents', 'distances']
+    )
+
     out = []
     try:
         metadatas = results['metadatas'][0]
         docs = results['documents'][0]
         dists = results['distances'][0]
+
         for md, doc, dist in zip(metadatas, docs, dists):
             out.append({
                 "assessment_name": md.get("name"),
@@ -52,4 +76,5 @@ def recommend(req: RecommendRequest):
     except Exception:
         for hit in results:
             out.append(hit)
+
     return {"query": q, "n_results": len(out), "recommendations": out}
